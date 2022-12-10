@@ -1,28 +1,28 @@
 const notes = require('express').Router();
-const {readFromFile, readAndAppend} = require('../helpers/fsHelper');
+const { v4: uuidv4 } = require('uuid');
+const {readFromFile, readAndAppend, writeToFile} = require('../helpers/fsHelper');
 
 notes.get('/', (req, res) => {
     readFromFile('./db/db.json').then((data) => res.json(JSON.parse(data)));
   })
 
-notes.get('/:noteTitle', (req, res) => {
-    const noteTitle = req.params.title;
+notes.delete('/:id', (req, res) => {
+    const noteId = req.params.id;
     readFromFile('./db/db.json')
       .then((data) => JSON.parse(data))
       .then((json) => {
-        const result = json.filter((note) => tip.title === noteTitle);
-        console.log(result);
-        return result.length > 0
-          ? res.json(result)
-          : res.json('NA');
+        const result = json.filter((note) => note.id !== noteId);
+        writeToFile('./db/db.json', result);
+        return res.json(result);
       });
   });
   
 
 notes.post('/', (req, res) => {
-  const { title, text } = req.body;
+  const { title, text, id } = req.body;
   if (req.body) {
     const newNote = {
+      id: uuidv4(),
       title,
       text
     };
